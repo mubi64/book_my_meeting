@@ -24,11 +24,15 @@
   {
    "fieldname": "room_name",
    "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Room Name"
   },
   {
    "fieldname": "capacity",
    "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Capacity"
   },
   {
@@ -90,13 +94,15 @@
    "description": "Minutes",
    "fieldname": "slot_duration",
    "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Slot Duration"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-19 13:07:18.678477",
+ "modified": "2025-05-19 19:24:13.442681",
  "modified_by": "Administrator",
  "module": "Book My Meeting",
  "name": "Meeting Room",

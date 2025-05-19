@@ -163,6 +163,21 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
             "message": _("The selected time slot is already booked. Please choose a different time.")
         }
         
+    # Check for user's other bookings in same day
+    overlapping_booking = frappe.db.exists(
+        "Meeting Room Booking",
+        {
+            "email": email,
+            "date": date,
+            "docstatus": 0,  # Draft state
+        }
+    )
+    if overlapping_booking:
+        return {
+            "success": False, 
+            "message": _("You have already booked a slot for this date.")
+        }
+        
     # Create a new Meeting Room Booking document
     booking = frappe.get_doc({
         "doctype": "Meeting Room Booking",
