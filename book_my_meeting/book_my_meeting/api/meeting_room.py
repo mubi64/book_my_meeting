@@ -1,0 +1,137 @@
+import frappe
+from datetime import datetime, timedelta
+import random
+from frappe import _
+
+@frappe.whitelist(allow_guest=True)
+def get_meeting_rooms():
+    rooms = frappe.get_all("Meeting Room", fields=["name", "room_name", "capacity", "location", "image_url"])
+
+    result = []
+    for idx, room in enumerate(rooms, start=1):
+        doc = frappe.get_doc("Meeting Room", room.name)
+        amenities = []
+        if doc.smart_tv:
+            amenities.append("Smart TV")
+        if doc.refreshments:
+            amenities.append("Refreshments")
+        if doc.video_conferencing:
+            amenities.append("Video conferencing")
+        if doc.whiteboard:
+            amenities.append("Whiteboard")
+        if doc.projector:
+            amenities.append("Projector")
+
+        result.append({
+            "id": doc.name,
+            "name": doc.room_name,
+            "capacity": doc.capacity,
+            "amenities": amenities,
+            "imageUrl": doc.image_url if doc.image_url else "",
+            "location": doc.location
+        })
+
+    return result
+
+@frappe.whitelist(allow_guest=True)
+def get_meeting_room_by_name(name, date=None):
+    doc = frappe.get_doc("Meeting Room", name)
+
+    # Amenities
+    amenities = []
+    if doc.smart_tv:
+        amenities.append("Smart TV")
+    if doc.refreshments:
+        amenities.append("Refreshments")
+    if doc.video_conferencing:
+        amenities.append("Video conferencing")
+    if doc.whiteboard:
+        amenities.append("Whiteboard")
+    if doc.projector:
+        amenities.append("Projector")
+
+    # Parse provided date
+    if not date:
+        frappe.throw("Date is required.")
+    requested_date = datetime.strptime(date, "%Y-%m-%d")
+    today = datetime.today()
+    now = datetime.now()
+    is_today = requested_date.date() == today.date()
+
+    # Working hours and slot duration
+    from_time = datetime.strptime(str(doc.from_time), "%H:%M:%S").time()
+    to_time = datetime.strptime(str(doc.to_time), "%H:%M:%S").time()
+    slot_duration = int(doc.slot_duration)
+
+    start_dt = datetime.combine(requested_date.date(), from_time)
+    end_dt = datetime.combine(requested_date.date(), to_time)
+
+    # Get bookings for that room on that date (in draft state)
+    bookings = frappe.get_all(
+        "Meeting Room Booking",
+        filters={
+            "meeting_room": name,
+            "date": requested_date.date(),
+            "docstatus": 0
+        },
+        fields=["start_time", "end_time"]
+    )
+
+    # Prepare booking intervals
+    booking_intervals = []
+    for b in bookings:
+        start_time = b["start_time"]
+        end_time = b["end_time"]
+
+        # Ensure types are correct
+        if isinstance(start_time, timedelta):
+            start_time = (datetime.min + start_time).time()
+        if isinstance(end_time, timedelta):
+            end_time = (datetime.min + end_time).time()
+
+        booking_intervals.append((
+            datetime.combine(requested_date.date(), start_time),
+            datetime.combine(requested_date.date(), end_time)
+        ))
+
+
+    # Function to check overlap
+    def is_overlapping(slot_start, slot_end):
+        for booking_start, booking_end in booking_intervals:
+            if slot_start < booking_end and slot_end > booking_start:
+                return True
+        return False
+
+    # Generate time slots
+    timeslots = []
+    current_time = start_dt
+    slot_id = 1
+
+    while current_time + timedelta(minutes=slot_duration) <= end_dt:
+        slot_start = current_time
+        slot_end = current_time + timedelta(minutes=slot_duration)
+
+        # Check if slot is in the past (only if today)
+        in_past = is_today and slot_start < now
+        has_conflict = is_overlapping(slot_start, slot_end)
+        is_available = not in_past and not has_conflict
+
+        timeslots.append({
+            "id": f"slot-{slot_id}",
+            "startTime": slot_start.strftime("%H:%M"),
+            "endTime": slot_end.strftime("%H:%M"),
+            "isAvailable": is_available
+        })
+
+        current_time = slot_end
+        slot_id += 1
+
+    return {
+        "id": doc.name,
+        "name": doc.room_name,
+        "capacity": doc.capacity,
+        "amenities": amenities,
+        "imageUrl": doc.image_url or "",
+        "location": doc.location,
+        "timeslots": timeslots
+    }

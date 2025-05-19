@@ -1,0 +1,28 @@
+{
+  "name": "frappe-ui-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=/assets/book_my_meeting/bookmymeeting/ && yarn copy-html-entry",
+    "preview": "vite preview",
+    "copy-html-entry": "cp ../book_my_meeting/public/bookmymeeting/index.html ../book_my_meeting/www/bookmymeeting.html"
+  },
+  "dependencies": {
+    "feather-icons": "^4.28.0",
+    "lucide-vue-next": "^0.344.0",
+    "pinia": "^2.1.7",
+    "frappe-ui": "^0.1.143",
+    "vue": "^3.4.23",
+    "vue-router": "^4.0.12",
+    "date-fns": "^3.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.3",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.10"
+  }
+}

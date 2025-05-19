@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-19 13:11:42.760829",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "meeting_room",
+  "room_name",
+  "capacity",
+  "booked_for",
+  "column_break_xopn",
+  "date",
+  "start_time",
+  "end_time"
+ ],
+ "fields": [
+  {
+   "fieldname": "meeting_room",
+   "fieldtype": "Link",
+   "label": "Meeting Room",
+   "options": "Meeting Room"
+  },
+  {
+   "fieldname": "column_break_xopn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "meeting_room.room_name",
+   "fieldname": "room_name",
+   "fieldtype": "Read Only",
+   "label": "Room Name"
+  },
+  {
+   "fetch_from": "meeting_room.capacity",
+   "fieldname": "capacity",
+   "fieldtype": "Read Only",
+   "label": "Capacity"
+  },
+  {
+   "fieldname": "booked_for",
+   "fieldtype": "Data",
+   "label": "Booked For"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "label": "End Time"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-05-19 13:15:24.684880",
+ "modified_by": "Administrator",
+ "module": "Book My Meeting",
+ "name": "Meeting Room Booking",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
