@@ -94,10 +94,19 @@ const selectTimeSlot = (slotId) => {
 
 const proceedToBooking = () => {
   if (selectedSlotId.value) {
-    router.push({
-      name: 'BookingForm',
-      params: { roomId, slotId: selectedSlotId.value }
-    });
+    const selectedSlot = selectedRoom.data.timeslots.find(slot => slot.id === selectedSlotId.value);
+    if (selectedSlot) {
+      router.push({
+        name: 'BookingForm',
+        params: { roomId, slotId: selectedSlotId.value },
+        query: {
+          date: selectedDate.value.toISOString().split('T')[0],
+          startTime: selectedSlot.startTime,
+          endTime: selectedSlot.endTime,
+          roomName: selectedRoom.data.name
+        }
+      });
+    }
   }
 };
 </script>

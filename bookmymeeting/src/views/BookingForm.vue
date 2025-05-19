@@ -1,12 +1,12 @@
 <template>
   <div class="container py-6 max-w-2xl">
-    <div v-if="selectedRoom && selectedSlot">
+    <div v-if="roomId && slotId && startTime && endTime">
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Booking Details</h2>
         <p class="text-gray-600 dark:text-gray-400">
-          Complete your booking for <span class="font-medium text-blue-600 dark:text-blue-400">{{ selectedRoom.name }}</span>
+          Complete your booking for <span class="font-medium text-blue-600 dark:text-blue-400">{{ roomName }}</span>
           on <span class="font-medium">{{ formattedDate }}</span> at 
-          <span class="font-medium">{{ selectedSlot.startTime }} - {{ selectedSlot.endTime }}</span>
+          <span class="font-medium">{{ startTime }} - {{ endTime }}</span>
         </p>
       </div>
       
@@ -31,7 +31,7 @@
               id="email" 
               v-model="userDetails.email" 
               class="form-input" 
-              placeholder="Enter your email address"
+              placeholder="Enter your registered email address"
               required
             />
           </div>
@@ -83,80 +83,137 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import router from '@/router'
+import { useRoute } from 'vue-router';
 import { format } from 'date-fns';
-import { useBookingStore } from '../stores/bookingStore';
 import { RefreshCw } from 'lucide-vue-next';
 
-export default {
-  name: 'BookingForm',
-  components: {
-    RefreshCw
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const bookingStore = useBookingStore();
+const route = useRoute();
+const roomId = route.params.roomId;
+const slotId = route.params.slotId;
+const roomName = route.query.roomName;
+const date = route.query.date;
+const startTime = route.query.startTime;
+const endTime = route.query.endTime;
+console.log(roomId, startTime, endTime);
+const userDetails = ref({
+  name: '',
+  email: '',
+  phone: '',
+  purpose: ''
+});
+
+const formattedDate = computed(() => {
+  return format(date, 'EEEE, MMMM do, yyyy'); // Replace with actual date logic if needed
+});
+
+const selectedSlot = ref({
+  startTime,
+  endTime
+});
+
+const submitBooking = async () => {
+  isSubmitting.value = true;
+  
+  try {
+    // Set user details in the store
+    bookingStore.setUserDetails(userDetails.value);
     
-    const userDetails = ref({
-      name: '',
-      email: '',
-      phone: '',
-      purpose: ''
+    // Create booking and get booking ID
+    const bookingId = bookingStore.createBooking();
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Navigate to confirmation page
+    router.push({
+      name: 'BookingConfirmation',
+      params: { bookingId }
     });
-    
-    const isSubmitting = ref(false);
-    
-    const formattedDate = computed(() => {
-      return format(bookingStore.selectedDate, 'EEEE, MMMM do, yyyy');
-    });
-    
-    const submitBooking = async () => {
-      isSubmitting.value = true;
-      
-      try {
-        // Set user details in the store
-        bookingStore.setUserDetails(userDetails.value);
-        
-        // Create booking and get booking ID
-        const bookingId = bookingStore.createBooking();
-        
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Navigate to confirmation page
-        router.push({
-          name: 'BookingConfirmation',
-          params: { bookingId }
-        });
-      } catch (error) {
-        console.error('Error creating booking:', error);
-        alert('There was an error creating your booking. Please try again.');
-      } finally {
-        isSubmitting.value = false;
-      }
-    };
-    
-    const goBack = () => {
-      router.back();
-    };
-    
-    const goToRoomSelection = () => {
-      router.push({ name: 'RoomSelection' });
-    };
-    
-    return {
-      selectedRoom: bookingStore.selectedRoom,
-      selectedSlot: bookingStore.selectedSlot,
-      formattedDate,
-      userDetails,
-      isSubmitting,
-      submitBooking,
-      goBack,
-      goToRoomSelection
-    };
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    alert('There was an error creating your booking. Please try again.');
+  } finally {
+    isSubmitting.value = false;
   }
 };
+
+const goBack = () => {
+  router.back();
+};
+
+// console.log(roomId, startTime, endTime);
+
+
+// export default {
+//   name: 'BookingForm',
+//   components: {
+//     RefreshCw
+//   },
+//   setup() {
+//     const route = useRoute();
+//     const router = useRouter();
+//     const bookingStore = useBookingStore();
+    
+//     const userDetails = ref({
+//       name: '',
+//       email: '',
+//       phone: '',
+//       purpose: ''
+//     });
+    
+//     const isSubmitting = ref(false);
+    
+//     const formattedDate = computed(() => {
+//       return format(bookingStore.selectedDate, 'EEEE, MMMM do, yyyy');
+//     });
+    
+//     const submitBooking = async () => {
+//       isSubmitting.value = true;
+      
+//       try {
+//         // Set user details in the store
+//         bookingStore.setUserDetails(userDetails.value);
+        
+//         // Create booking and get booking ID
+//         const bookingId = bookingStore.createBooking();
+        
+//         // Simulate API call
+//         await new Promise(resolve => setTimeout(resolve, 1000));
+        
+//         // Navigate to confirmation page
+//         router.push({
+//           name: 'BookingConfirmation',
+//           params: { bookingId }
+//         });
+//       } catch (error) {
+//         console.error('Error creating booking:', error);
+//         alert('There was an error creating your booking. Please try again.');
+//       } finally {
+//         isSubmitting.value = false;
+//       }
+//     };
+    
+//     const goBack = () => {
+//       router.back();
+//     };
+    
+//     const goToRoomSelection = () => {
+//       router.push({ name: 'RoomSelection' });
+//     };
+    
+//     return {
+//       selectedRoom: bookingStore.selectedRoom,
+//       selectedSlot: bookingStore.selectedSlot,
+//       formattedDate,
+//       userDetails,
+//       isSubmitting,
+//       submitBooking,
+//       goBack,
+//       goToRoomSelection
+//     };
+//   }
+// };
 </script>
