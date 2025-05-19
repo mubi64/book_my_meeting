@@ -20,7 +20,7 @@ const routes = [
     meta: { title: 'Booking Details' }
   },
   {
-    path: '/confirmation/:bookingId',
+    path: '/confirmation',
     name: 'BookingConfirmation',
     component: () => import('@/views/BookingConfirmation.vue'),
     meta: { title: 'Booking Confirmed' }

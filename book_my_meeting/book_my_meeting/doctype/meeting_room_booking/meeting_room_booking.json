@@ -9,6 +9,9 @@
   "room_name",
   "capacity",
   "booked_for",
+  "email",
+  "phone",
+  "purpose",
   "column_break_xopn",
   "date",
   "start_time",
@@ -56,12 +59,27 @@
    "fieldname": "end_time",
    "fieldtype": "Time",
    "label": "End Time"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Small Text",
+   "label": "Purpose"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-19 13:15:24.684880",
+ "modified": "2025-05-19 16:55:54.245960",
  "modified_by": "Administrator",
  "module": "Book My Meeting",
  "name": "Meeting Room Booking",

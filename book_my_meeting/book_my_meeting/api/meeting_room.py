@@ -135,3 +135,50 @@ def get_meeting_room_by_name(name, date=None):
         "location": doc.location,
         "timeslots": timeslots
     }
+
+@frappe.whitelist(allow_guest=True)
+def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, email, phone, purpose):
+    # Check if email exists in contacts
+    contact_exists = frappe.db.exists("Contact", {"email_id": email})
+    if not contact_exists:
+        return {
+            "success": False, 
+            "message": _("The provided email is not registered with us. Please contact support.")
+        }
+
+    # Check for overlapping bookings
+    overlapping_booking = frappe.db.exists(
+        "Meeting Room Booking",
+        {
+            "meeting_room": meeting_room,
+            "date": date,
+            "docstatus": 0,  # Draft state
+            "start_time": ("<", end_time),
+            "end_time": (">", start_time)
+        }
+    )
+    if overlapping_booking:
+        return {
+            "success": False, 
+            "message": _("The selected time slot is already booked. Please choose a different time.")
+        }
+        
+    # Create a new Meeting Room Booking document
+    booking = frappe.get_doc({
+        "doctype": "Meeting Room Booking",
+        "meeting_room": meeting_room,
+        "date": date,
+        "start_time": start_time,
+        "end_time": end_time,
+        "booked_for": name,
+        "email": email,
+        "phone": phone,
+        "purpose": purpose,
+        "docstatus": 0  # Draft state
+    })
+
+    # Save the booking
+    booking.insert(ignore_permissions=True)
+    frappe.db.commit()
+
+    return {"success": True, "message": _("Meeting room booking saved successfully.")}

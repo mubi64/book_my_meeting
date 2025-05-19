@@ -41,13 +41,13 @@
             </button>
           </div>
         </div>
-        <div v-else class="text-center py-12">
-          <p class="text-gray-600 dark:text-gray-400">Loading...</p>
+        <div v-else class="flex items-center justify-center h-screen">
+          <Spinner class="w-8" />
         </div>
       </div>
     </div>
-    <div v-else class="text-center py-12">
-      <p class="text-gray-600 dark:text-gray-400">Loading...</p>
+    <div v-else class="flex items-center justify-center h-screen">
+      <Spinner class="w-8" />
     </div>
   </div>
 </template>
@@ -55,11 +55,11 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import router from '@/router'
-import { createResource } from 'frappe-ui'
+import { createResource, Spinner } from 'frappe-ui'
 import { useRoute } from 'vue-router';
 import { format } from 'date-fns';
-import DatePicker from '../components/ui/DatePicker.vue';
-import TimeSlotCard from '../components/ui/TimeSlotCard.vue';
+import DatePicker from '@/components/ui/DatePicker.vue';
+import TimeSlotCard from '@/components/ui/TimeSlotCard.vue';
 
 const route = useRoute();
 const roomId = route.params.id;
@@ -81,10 +81,12 @@ const formattedSelectedDate = computed(() => {
 
 watch(selectedDate, (newDate) => {
   const adjustedDate = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000);
-  selectedRoom.params = {
-    name: roomId,
-    date: adjustedDate.toISOString().split('T')[0]
-  };
+  selectedRoom.update({
+    params:{
+      name: roomId,
+      date: adjustedDate.toISOString().split('T')[0]
+    }
+  });
   selectedRoom.fetch();
 });
 
@@ -96,11 +98,12 @@ const proceedToBooking = () => {
   if (selectedSlotId.value) {
     const selectedSlot = selectedRoom.data.timeslots.find(slot => slot.id === selectedSlotId.value);
     if (selectedSlot) {
+      const adjustedDate = new Date(selectedDate.value.getTime() - selectedDate.value.getTimezoneOffset() * 60000);
       router.push({
         name: 'BookingForm',
         params: { roomId, slotId: selectedSlotId.value },
         query: {
-          date: selectedDate.value.toISOString().split('T')[0],
+          date: adjustedDate.toISOString().split('T')[0],
           startTime: selectedSlot.startTime,
           endTime: selectedSlot.endTime,
           roomName: selectedRoom.data.name

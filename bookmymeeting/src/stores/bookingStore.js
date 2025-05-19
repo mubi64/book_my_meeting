@@ -4,7 +4,7 @@ import { generateTimeSlots, bookings } from '@/data/mockData';
 import { createResource } from 'frappe-ui'
 
 
-let bookingStore = defineStore('booking', {
+export const useBookingStore = defineStore('booking', {
   state: () => ({
     rooms: [],
     selectedRoom: null,
@@ -28,12 +28,12 @@ let bookingStore = defineStore('booking', {
   },
   
   actions: {
-    async fetchRooms() {
+    fetchRooms() {
       createResource({
         url: 'book_my_meeting.book_my_meeting.api.meeting_room.get_meeting_rooms',
         auto: true,
         onSuccess(data) {
-          this.rooms.value = data;
+          this.rooms = data;
         },
       })
     },
@@ -106,5 +106,3 @@ let bookingStore = defineStore('booking', {
     }
   }
 });
-
-export default bookingStore;

@@ -86,6 +86,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import router from '@/router'
+import { createResource } from 'frappe-ui'
 import { useRoute } from 'vue-router';
 import { format } from 'date-fns';
 import { RefreshCw } from 'lucide-vue-next';
@@ -114,30 +115,48 @@ const selectedSlot = ref({
   endTime
 });
 
-const submitBooking = async () => {
-  isSubmitting.value = true;
-  
-  try {
-    // Set user details in the store
-    bookingStore.setUserDetails(userDetails.value);
-    
-    // Create booking and get booking ID
-    const bookingId = bookingStore.createBooking();
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Navigate to confirmation page
+const booking = createResource({
+  url: 'book_my_meeting.book_my_meeting.api.meeting_room.save_meeting_room_booking',
+  method: 'POST',
+  onSuccess: (response) => {
+    console.log(response)
+    if(!response.success) {
+      alert(response.message);
+      return;
+    }
+    //Navigate to confirmation page
     router.push({
       name: 'BookingConfirmation',
-      params: { bookingId }
+      query: {
+        roomName: roomName,
+        date: date,
+        start_time: selectedSlot.value.startTime,
+        end_time: selectedSlot.value.endTime,
+        name: userDetails.value.name,
+        email: userDetails.value.email,
+        phone: userDetails.value.phone,
+        purpose: userDetails.value.purpose
+      }
     });
-  } catch (error) {
-    console.error('Error creating booking:', error);
-    alert('There was an error creating your booking. Please try again.');
-  } finally {
-    isSubmitting.value = false;
+  },
+  onError: (error) => {
+    console.log('Error creating booking:');
+    console.log(error.data);
+    // alert('There was an error creating your booking. Please try again.');
   }
+})
+
+const submitBooking = () => {
+  booking.submit({
+    meeting_room: roomId,
+    date: date,
+    start_time: selectedSlot.value.startTime,
+    end_time: selectedSlot.value.endTime,
+    name: userDetails.value.name,
+    email: userDetails.value.email,
+    phone: userDetails.value.phone,
+    purpose: userDetails.value.purpose
+  });
 };
 
 const goBack = () => {

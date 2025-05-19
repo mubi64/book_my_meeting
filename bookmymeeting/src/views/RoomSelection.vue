@@ -14,14 +14,14 @@
       />
     </div>
   </div>
-  <div v-else class="text-center py-12">
-    <p class="text-gray-600 dark:text-gray-400">Loading...</p>
+  <div v-else class="flex items-center justify-center h-screen">
+    <Spinner class="w-8" />
   </div>
 </template>
 
 <script setup>
 import router from '@/router'
-import { createResource } from 'frappe-ui'
+import { createResource, Spinner } from 'frappe-ui'
 import RoomCard from '@/components/ui/RoomCard.vue';
 
 
