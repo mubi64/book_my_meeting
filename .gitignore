@@ -5,3 +5,5 @@
 tags
 node_modules
 __pycache__
+book_my_meeting/public/bookmymeeting
+book_my_meeting/www/bookmymeeting.html

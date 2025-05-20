@@ -85,7 +85,8 @@ def get_meeting_room_by_name(name, date=None):
         filters={
             "meeting_room": name,
             "date": requested_date.date(),
-            "docstatus": 0
+            "docstatus": 0,
+            "status": "Confirmed",
         },
         fields=["start_time", "end_time"]
     )
@@ -150,6 +151,13 @@ def get_meeting_room_by_name(name, date=None):
 
 @frappe.whitelist(allow_guest=True)
 def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, email, phone, purpose):
+    # Check if all parameters are provided
+    if not all([meeting_room, date, start_time, end_time, name, email, phone, purpose]):
+        return {
+                "success": False,
+                "message": _("Please fill the required fields")
+            }
+
     # Fetch the Meeting Room document
     meeting_room_doc = frappe.get_doc("Meeting Room", meeting_room)
 

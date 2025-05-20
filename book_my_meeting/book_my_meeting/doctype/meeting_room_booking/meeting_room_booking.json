@@ -66,7 +66,6 @@
   {
    "fieldname": "end_time",
    "fieldtype": "Time",
-   "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "End Time"
   },
@@ -99,7 +98,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-20 16:03:38.776393",
+ "modified": "2025-05-20 17:40:11.139993",
  "modified_by": "Administrator",
  "module": "Book My Meeting",
  "name": "Meeting Room Booking",
