@@ -58,13 +58,15 @@
               required
             ></textarea>
           </div>
+
+          <ErrorMessage :message="errorMessage" class="mt-4" />
           
           <div class="mt-8 flex items-center justify-between">
             <button type="button" @click="goBack" class="btn btn-outline p-2">
               Back
             </button>
-            <button type="submit" class="btn btn-primary p-2" :disabled="isSubmitting">
-              <span v-if="isSubmitting" class="flex items-center">
+            <button type="submit" class="btn btn-primary p-2" :disabled="booking.loading">
+              <span v-if="booking.loading" class="flex items-center">
                 <RefreshCw size="16" class="animate-spin mr-2" />
                 Submitting...
               </span>
@@ -86,19 +88,23 @@
 <script setup>
 import { ref, computed } from 'vue';
 import router from '@/router'
-import { createResource } from 'frappe-ui'
+import { createResource, ErrorMessage } from 'frappe-ui'
 import { useRoute } from 'vue-router';
 import { format } from 'date-fns';
 import { RefreshCw } from 'lucide-vue-next';
 
+const errorMessage = ref('');
+
 const route = useRoute();
-const roomId = route.params.roomId;
-const slotId = route.params.slotId;
-const roomName = route.query.roomName;
-const date = route.query.date;
-const startTime = route.query.startTime;
-const endTime = route.query.endTime;
-console.log(roomId, startTime, endTime);
+const {roomId, slotId } = route.params;
+
+const { 
+  roomName,
+  date,
+  startTime,
+  endTime
+ } = route.query;
+
 const userDetails = ref({
   name: '',
   email: '',
@@ -121,7 +127,7 @@ const booking = createResource({
   onSuccess: (response) => {
     console.log(response)
     if(!response.success) {
-      alert(response.message);
+      errorMessage.value = response.message;
       return;
     }
     //Navigate to confirmation page

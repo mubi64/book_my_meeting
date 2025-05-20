@@ -10,7 +10,7 @@
         v-for="room in rooms.data" 
         :key="room.id" 
         :room="room" 
-        @select="selectRoom(room.id)"
+        @select="selectRoom(room.id, room.name)"
       />
     </div>
   </div>
@@ -30,38 +30,12 @@ const rooms = createResource({
   auto: true
 })
 
-const selectRoom = (roomId) => {
-  router.push({ name: 'TimeSlotSelection', params: { id: roomId } });
+const selectRoom = (roomId, roomName) => {
+  router.push({ 
+    name: 'TimeSlotSelection', 
+    params: { id: roomId },
+    query: { roomName }
+  });
 };
 
-// export default {
-//   name: 'RoomSelection',
-//   components: {
-//     RoomCard
-//   },
-//   setup() {
-//     const router = useRouter();
-//     const bookingStore = useBookingStore();
-
-//     rooms = createResource({
-//       url: 'book_my_meeting.book_my_meeting.api.meeting_room.get_meeting_rooms',
-//       auto: true
-//     })
-    
-//     const selectRoom = (roomId) => {
-//       bookingStore.selectRoom(roomId);
-//       router.push({ name: 'TimeSlotSelection', params: { id: roomId } });
-//     };
-    
-//     onMounted(() => {
-//       // Reset the booking state when arriving at the room selection page
-//       bookingStore.resetBooking();
-//     });
-    
-//     return {
-//       rooms: bookingStore.rooms,
-//       selectRoom
-//     };
-//   }
-// };
 </script>

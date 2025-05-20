@@ -44,18 +44,18 @@
                 </span>
                 <span class="mx-2 text-gray-400">|</span>
                 <span class="text-sm">
-                  {{ booking.timeSlot.startTime }} - {{ booking.timeSlot.endTime }}
+                  {{ booking.startTime }} - {{ booking.endTime }}
                 </span>
               </div>
               <span 
                 :class="[
                   'badge',
-                  isUpcoming(booking.date) 
+                  isUpcoming(booking.date+' ' + booking.startTime) 
                     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' 
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
                 ]"
               >
-                {{ isUpcoming(booking.date) ? 'Upcoming' : 'Past' }}
+                {{ isUpcoming(booking.date+' ' + booking.startTime) ? 'Upcoming' : 'Past' }}
               </span>
             </div>
             
@@ -67,19 +67,19 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">Purpose</div>
-                  <div class="font-medium">{{ booking.user.purpose }}</div>
+                  <div class="font-medium" v-html="formattedText(booking.purpose)"></div>
                 </div>
                 
                 <div>
                   <div class="text-sm text-gray-500 dark:text-gray-400">Contact</div>
-                  <div class="font-medium">{{ booking.user.name }}</div>
-                  <div class="text-sm">{{ booking.user.email }}</div>
-                  <div class="text-sm">{{ booking.user.phone }}</div>
+                  <div class="font-medium">{{ booking.name }}</div>
+                  <div class="text-sm">{{ booking.email }}</div>
+                  <div class="text-sm">{{ booking.phone }}</div>
                 </div>
               </div>
               
               <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
-                Booked on {{ formatDateTime(booking.createdAt) }}
+                Booked on {{ formatDateTime(booking.creation) }}
               </div>
             </div>
           </div>
@@ -91,7 +91,7 @@
         <p class="text-gray-600 dark:text-gray-400 mb-6">
           We couldn't find any reservations for {{ searchEmail }}
         </p>
-        <button @click="goToRoomSelection" class="btn btn-primary">
+        <button @click="goToRoomSelection" class="btn btn-primary p-2">
           Make a Booking
         </button>
       </div>
@@ -99,58 +99,56 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import router from '@/router'
+import { createResource, Spinner } from 'frappe-ui'
 import { format, parseISO, isAfter } from 'date-fns';
-import { useBookingStore } from '../stores/bookingStore';
 import { Search, CalendarX } from 'lucide-vue-next';
 
-export default {
-  name: 'ReservationHistory',
-  components: {
-    Search,
-    CalendarX
+const searchEmail = ref('');
+const userBookings = ref([]);
+const hasSearched = ref(false);
+
+let searchResource = createResource({
+  url: 'book_my_meeting.book_my_meeting.api.meeting_room.get_bookings_by_email',
+  onSuccess: (data) => {
+    if(data.success === false) {
+      userBookings.value = [];
+      // alert(data.message);
+      return;
+    }
+    userBookings.value = data.message;
   },
-  setup() {
-    const router = useRouter();
-    const bookingStore = useBookingStore();
-    
-    const searchEmail = ref('');
-    const userBookings = ref([]);
-    const hasSearched = ref(false);
-    
-    const searchBookings = () => {
-      userBookings.value = bookingStore.getBookingsByEmail(searchEmail.value);
-      hasSearched.value = true;
-    };
-    
-    const formatDate = (dateString) => {
-      return format(parseISO(dateString), 'EEEE, MMMM do, yyyy');
-    };
-    
-    const formatDateTime = (dateTimeString) => {
-      return format(parseISO(dateTimeString), 'MMM d, yyyy h:mm a');
-    };
-    
-    const isUpcoming = (dateString) => {
-      return isAfter(parseISO(dateString), new Date());
-    };
-    
-    const goToRoomSelection = () => {
-      router.push({ name: 'RoomSelection' });
-    };
-    
-    return {
-      searchEmail,
-      userBookings,
-      hasSearched,
-      searchBookings,
-      formatDate,
-      formatDateTime,
-      isUpcoming,
-      goToRoomSelection
-    };
+  onError: (error) => {
+    console.error('Error fetching bookings:', error);
   }
+})
+
+const searchBookings = async () => {
+  await searchResource.fetch({
+    email: searchEmail.value
+  });
+  hasSearched.value = true;
+};
+
+const formatDate = (dateString) => {
+  return format(parseISO(dateString), 'EEEE, MMMM do, yyyy');
+};
+
+const formattedText = (text) => {
+  return text.replace(/\n/g, '<br />');
+};
+
+const formatDateTime = (dateTimeString) => {
+  return format(parseISO(dateTimeString), 'MMM d, yyyy h:mm a');
+};
+
+const isUpcoming = (dateString) => {
+  return isAfter(parseISO(dateString), new Date());
+};
+
+const goToRoomSelection = () => {
+  router.push({ name: 'RoomSelection' });
 };
 </script>

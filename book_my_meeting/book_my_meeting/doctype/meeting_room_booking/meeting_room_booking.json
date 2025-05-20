@@ -16,7 +16,8 @@
   "column_break_xopn",
   "date",
   "start_time",
-  "end_time"
+  "end_time",
+  "status"
  ],
  "fields": [
   {
@@ -33,6 +34,8 @@
    "fetch_from": "meeting_room.room_name",
    "fieldname": "room_name",
    "fieldtype": "Read Only",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Room Name"
   },
   {
@@ -49,16 +52,22 @@
   {
    "fieldname": "date",
    "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Date"
   },
   {
    "fieldname": "start_time",
    "fieldtype": "Time",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Start Time"
   },
   {
    "fieldname": "end_time",
    "fieldtype": "Time",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "End Time"
   },
   {
@@ -74,13 +83,23 @@
   {
    "fieldname": "email",
    "fieldtype": "Data",
+   "in_standard_filter": 1,
    "label": "Email"
+  },
+  {
+   "default": "Confirmed",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Confirmed\nCancelled"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-19 19:25:21.090033",
+ "modified": "2025-05-20 16:03:38.776393",
  "modified_by": "Administrator",
  "module": "Book My Meeting",
  "name": "Meeting Room Booking",
@@ -103,5 +122,6 @@
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

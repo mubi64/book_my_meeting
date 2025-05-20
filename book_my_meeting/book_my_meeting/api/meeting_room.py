@@ -37,6 +37,19 @@ def get_meeting_rooms():
 def get_meeting_room_by_name(name, date=None):
     doc = frappe.get_doc("Meeting Room", name)
 
+    # Check allowed future booking days
+    allowed_days = doc.allowed_future_booking_days
+    if allowed_days is not None:
+        if not date:
+            frappe.throw(_("Date is required."))
+        requested_date = datetime.strptime(date, "%Y-%m-%d").date()
+        max_allowed_date = datetime.today().date() + timedelta(days=allowed_days)
+        if requested_date > max_allowed_date:
+            return {
+                "success": False,
+                "message": _("Bookings not opened for this day yet.")
+            }
+
     # Amenities
     amenities = []
     if doc.smart_tv:
@@ -94,7 +107,6 @@ def get_meeting_room_by_name(name, date=None):
             datetime.combine(requested_date.date(), end_time)
         ))
 
-
     # Function to check overlap
     def is_overlapping(slot_start, slot_end):
         for booking_start, booking_end in booking_intervals:
@@ -138,6 +150,20 @@ def get_meeting_room_by_name(name, date=None):
 
 @frappe.whitelist(allow_guest=True)
 def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, email, phone, purpose):
+    # Fetch the Meeting Room document
+    meeting_room_doc = frappe.get_doc("Meeting Room", meeting_room)
+
+    # Check allowed future booking days
+    allowed_days = meeting_room_doc.allowed_future_booking_days
+    if allowed_days is not None:
+        booking_date = datetime.strptime(date, "%Y-%m-%d").date()
+        max_allowed_date = datetime.today().date() + timedelta(days=allowed_days)
+        if booking_date > max_allowed_date:
+            return {
+                "success": False,
+                "message": _("Bookings are only allowed up to {0} days in advance.").format(allowed_days)
+            }
+
     # Check if email exists in contacts
     contact_exists = frappe.db.exists("Contact", {"email_id": email})
     if not contact_exists:
@@ -153,6 +179,7 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
             "meeting_room": meeting_room,
             "date": date,
             "docstatus": 0,  # Draft state
+            "status": "Confirmed",
             "start_time": ("<", end_time),
             "end_time": (">", start_time)
         }
@@ -169,7 +196,8 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
         {
             "email": email,
             "date": date,
-            "docstatus": 0,  # Draft state
+            "docstatus": 0,  # Draft state,
+            "status": "Confirmed",
         }
     )
     if overlapping_booking:
@@ -197,3 +225,46 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
     frappe.db.commit()
 
     return {"success": True, "message": _("Meeting room booking saved successfully.")}
+
+@frappe.whitelist(allow_guest=True)
+def get_bookings_by_email(email):
+    if not email:
+        frappe.throw(_("Email is required."))
+
+    # Check if email exists in contacts
+    contact_exists = frappe.db.exists("Contact", {"email_id": email})
+    if not contact_exists:
+        return {
+            "success": False,
+            "message": _("The provided email is not registered with us. Please contact support.")
+        }
+
+    # Fetch bookings associated with the email
+    bookings = frappe.get_all(
+        "Meeting Room Booking",
+        filters={"email": email, "docstatus": 0},  # Draft state
+        fields=["name", "room_name", "booked_for", "email", "phone", "date", "start_time", "end_time", "purpose", "creation", "status"],
+        order_by="date desc, start_time desc"
+    )
+
+    # Format the response
+    formatted_bookings = []
+    for booking in bookings:
+        formatted_bookings.append({
+            "id": booking["name"],
+            "roomName": booking["room_name"],
+            "email": booking["email"],
+            "phone": booking["phone"],
+            "name": booking["booked_for"],
+            "date": booking["date"],
+            "startTime": datetime.strptime(str(booking["start_time"]), "%H:%M:%S").strftime("%H:%M"),
+            "endTime": datetime.strptime(str(booking["end_time"]), "%H:%M:%S").strftime("%H:%M"),
+            "purpose": booking["purpose"],
+            "status": booking["status"],
+            "creation": booking["creation"]
+        })
+
+    return {
+        "success": True,
+        "message": formatted_bookings
+    }

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { Users, MapPin, Monitor, PenSquare, Video, Coffee } from 'lucide-vue-next';
+import { Users, MapPin, Monitor, PenSquare, Video, Coffee, Projector } from 'lucide-vue-next';
 
 export default {
   name: 'RoomCard',
@@ -63,10 +63,11 @@ export default {
   methods: {
     getAmenityIcon(amenity) {
       const amenityLower = amenity.toLowerCase();
-      if (amenityLower.includes('projector') || amenityLower.includes('tv')) return Monitor;
+      if (amenityLower.includes('tv')) return Monitor;
+      if (amenityLower.includes('projector')) return Projector;
       if (amenityLower.includes('whiteboard')) return PenSquare;
       if (amenityLower.includes('video')) return Video;
-      if (amenityLower.includes('coffee')) return Coffee;
+      if (amenityLower.includes('refreshments')) return Coffee;
       return MapPin; // Default icon
     }
   },

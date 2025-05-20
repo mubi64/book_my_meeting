@@ -13,6 +13,7 @@
   "from_time",
   "to_time",
   "slot_duration",
+  "allowed_future_booking_days",
   "column_break_ajov",
   "smart_tv",
   "refreshments",
@@ -32,6 +33,7 @@
    "fieldname": "capacity",
    "fieldtype": "Int",
    "in_list_view": 1,
+   "in_preview": 1,
    "in_standard_filter": 1,
    "label": "Capacity"
   },
@@ -97,12 +99,19 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Slot Duration"
+  },
+  {
+   "default": "5",
+   "fieldname": "allowed_future_booking_days",
+   "fieldtype": "Int",
+   "label": "Allowed Future Booking Days"
   }
  ],
  "grid_page_length": 50,
+ "image_field": "image_url",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-19 19:24:13.442681",
+ "modified": "2025-05-20 15:39:45.041691",
  "modified_by": "Administrator",
  "module": "Book My Meeting",
  "name": "Meeting Room",

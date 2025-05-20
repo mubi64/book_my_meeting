@@ -1,0 +1,74 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"Es4YnF7zxq\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Book My Meeting</span>\",\"col\":12}},{\"id\":\"ggMG9nwH89\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Book My Meeting App Link\",\"col\":12}},{\"id\":\"1qOjZ57_7C\",\"type\":\"card\",\"data\":{\"card_name\":\"Setups\",\"col\":4}},{\"id\":\"_Ap265GVDo\",\"type\":\"card\",\"data\":{\"card_name\":\"Transactions\",\"col\":4}}]",
+ "creation": "2025-05-20 15:43:12.627440",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Book My Meeting App Link",
+   "label": "Book My Meeting App Link"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "milestone",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Book My Meeting",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Transactions",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Meeting Room Booking",
+   "link_count": 0,
+   "link_to": "Meeting Room Booking",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "description": "",
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Setups",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Meeting Room",
+   "link_count": 0,
+   "link_to": "Meeting Room",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-05-20 15:51:17.062312",
+ "modified_by": "Administrator",
+ "module": "Book My Meeting",
+ "name": "Book My Meeting",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 39.0,
+ "shortcuts": [],
+ "title": "Book My Meeting"
+}

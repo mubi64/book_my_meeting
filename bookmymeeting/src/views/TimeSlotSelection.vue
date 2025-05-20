@@ -4,7 +4,7 @@
       <div class="mb-6">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Select a Time Slot</h2>
         <p class="text-gray-600 dark:text-gray-400">
-          Booking for <span class="font-medium text-blue-600 dark:text-blue-400">{{ selectedRoom.data.name }}</span>
+          Booking for <span class="font-medium text-blue-600 dark:text-blue-400">{{ roomName }}</span>
         </p>
       </div>
       
@@ -30,8 +30,16 @@
               />
             </div>
           </div>
-          
-          <div class="mt-6">
+          <div v-if="errorMessage" class="text-center py-12 card p-8">
+            <CalendarX size="48" class="mx-auto text-gray-400 mb-4" />
+            <h3 class="text-xl font-medium text-gray-900 dark:text-white mb-2">
+              No data found
+            </h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-6">
+              {{ errorMessage }}
+            </p>
+          </div>
+          <div v-else class="mt-6">
             <button 
               class="btn btn-primary btn-lg"
               :disabled="!selectedSlotId"
@@ -55,16 +63,19 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import router from '@/router'
-import { createResource, Spinner } from 'frappe-ui'
+import { createResource, Spinner, ErrorMessage, } from 'frappe-ui'
 import { useRoute } from 'vue-router';
+import { CalendarX } from 'lucide-vue-next';
 import { format } from 'date-fns';
 import DatePicker from '@/components/ui/DatePicker.vue';
 import TimeSlotCard from '@/components/ui/TimeSlotCard.vue';
 
 const route = useRoute();
 const roomId = route.params.id;
+const { roomName } = route.query;
 const selectedDate = ref(new Date());
 const selectedSlotId = ref(null);
+const errorMessage = ref('');
 
 let selectedRoom = createResource({
   url: 'book_my_meeting.book_my_meeting.api.meeting_room.get_meeting_room_by_name',
@@ -72,7 +83,12 @@ let selectedRoom = createResource({
     name: roomId,
     date: selectedDate.value.toISOString().split('T')[0]
   },
-  auto: true
+  auto: true,
+  onSuccess: (data) => {
+    if(!data.success) {
+      errorMessage.value = data.message;
+    }
+  }
 })
 
 const formattedSelectedDate = computed(() => {
