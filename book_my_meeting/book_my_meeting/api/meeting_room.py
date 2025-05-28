@@ -52,7 +52,7 @@ def get_meeting_room_by_name(name, date=None):
         if requested_date > max_allowed_date:
             return {
                 "success": False,
-                "message": _("Bookings not opened for this day yet.")
+                "message": _("Bookings for this day are not open yet.")
             }
 
     # Amenities
@@ -182,7 +182,7 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
     if not contact_exists:
         return {
             "success": False, 
-            "message": _("The provided email is not registered with us. Please contact support.")
+            "message": _("This email isn't registered. Please contact support if needed.")
         }
 
     # Check for overlapping bookings
@@ -216,7 +216,7 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
     if overlapping_booking:
         return {
             "success": False, 
-            "message": _("You have already booked a slot for this date.")
+            "message": _("You already have a reservation on this date.")
         }
     
     # Validate OTP if provided
@@ -265,7 +265,7 @@ def get_bookings_by_email(email,otp=None):
     if not contact_exists:
         return {
             "success": False,
-            "message": _("The provided email is not registered with us. Please contact support.")
+            "message": _("This email isn't registered. Please contact support if needed.")
         }
 
     # Validate OTP if provided
