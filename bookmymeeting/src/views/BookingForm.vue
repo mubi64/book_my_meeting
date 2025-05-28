@@ -59,8 +59,24 @@
             ></textarea>
           </div>
 
-          <ErrorMessage :message="errorMessage" class="mt-4" />
+          <!-- <ErrorMessage :message="errorMessage" class="mt-4" /> -->
+
+          <InfoMessage
+            class="mt-4"
+            :message="errorMessage"
+            :type="otpSent ? 'info' : 'error'"  />
           
+          <div class="form-group mt-4" v-if="otpSent">
+            <label for="otp" class="form-label">OTP</label>
+            <input 
+              type="text" 
+              id="otp" 
+              v-model="userDetails.otp" 
+              class="form-input" 
+              placeholder="Enter the OTP sent to your email"
+            />
+          </div>
+
           <div class="mt-8 flex items-center justify-between">
             <button type="button" @click="goBack" class="btn btn-outline p-2">
               Back
@@ -94,6 +110,7 @@ import { format } from 'date-fns';
 import { RefreshCw } from 'lucide-vue-next';
 
 const errorMessage = ref('');
+const otpSent = ref('');
 
 const route = useRoute();
 const {roomId, slotId } = route.params;
@@ -127,6 +144,9 @@ const booking = createResource({
   onSuccess: (response) => {
     console.log(response)
     if(!response.success) {
+      if(response.otpSent) {
+        otpSent.value = response.otpSent;
+      }
       errorMessage.value = response.message;
       return;
     }
@@ -161,7 +181,8 @@ const submitBooking = () => {
     name: userDetails.value.name,
     email: userDetails.value.email,
     phone: userDetails.value.phone,
-    purpose: userDetails.value.purpose
+    purpose: userDetails.value.purpose,
+    otp: userDetails.value.otp || ''
   });
 };
 

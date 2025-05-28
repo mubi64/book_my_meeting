@@ -11,6 +11,7 @@ declare module 'vue' {
     AppFooter: typeof import('./src/components/layout/AppFooter.vue')['default']
     AppHeader: typeof import('./src/components/layout/AppHeader.vue')['default']
     DatePicker: typeof import('./src/components/ui/DatePicker.vue')['default']
+    InfoMessage: typeof import('./src/components/ui/InfoMessage.vue')['default']
     RoomCard: typeof import('./src/components/ui/RoomCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

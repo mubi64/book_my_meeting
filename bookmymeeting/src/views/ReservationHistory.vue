@@ -17,15 +17,29 @@
             placeholder="Enter your email address"
             required
           />
+          <input
+            v-if="otpSent"
+            type="text"
+            v-model="otp"
+            maxlength="6"
+            placeholder="Enter OTP"
+            class="form-input w-32 p-2"
+          />
           <button type="submit" class="btn btn-primary p-2">
             <Search size="18" class="mr-2" />
             Search
           </button>
         </div>
       </form>
+
+      <InfoMessage
+        class="mt-4"
+        :message="errorMessage"
+        :type="otpSent ? 'info' : 'error'"  />
+
     </div>
     
-    <div v-if="hasSearched">
+    <div v-if="hasSearched && !errorMessage">
       <div v-if="userBookings.length > 0">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Found {{ userBookings.length }} reservation{{ userBookings.length !== 1 ? 's' : '' }}
@@ -102,23 +116,36 @@
 <script setup>
 import { ref } from 'vue';
 import router from '@/router'
-import { createResource, Spinner } from 'frappe-ui'
+import { createResource, ErrorMessage } from 'frappe-ui'
 import { format, parseISO, isAfter } from 'date-fns';
 import { Search, CalendarX } from 'lucide-vue-next';
+import InfoMessage from '@/components/ui/InfoMessage.vue';
+
+
 
 const searchEmail = ref('');
 const userBookings = ref([]);
 const hasSearched = ref(false);
 
+const errorMessage = ref('');
+const otpSent = ref('');
+const otp = ref('');
+
 let searchResource = createResource({
   url: 'book_my_meeting.book_my_meeting.api.meeting_room.get_bookings_by_email',
-  onSuccess: (data) => {
-    if(data.success === false) {
+  onSuccess: (response) => {
+    if(!response.success) {
+      if(response.otpSent) {
+        otpSent.value = response.otpSent;
+      }
       userBookings.value = [];
-      // alert(data.message);
+      errorMessage.value = response.message;
       return;
     }
-    userBookings.value = data.message;
+    otpSent.value = '';
+    otp.value = '';
+    errorMessage.value = '';
+    userBookings.value = response.message;
   },
   onError: (error) => {
     console.error('Error fetching bookings:', error);
@@ -127,7 +154,8 @@ let searchResource = createResource({
 
 const searchBookings = async () => {
   await searchResource.fetch({
-    email: searchEmail.value
+    email: searchEmail.value,
+    otp: otp.value || ''
   });
   hasSearched.value = true;
 };

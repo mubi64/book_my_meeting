@@ -2,6 +2,11 @@ import frappe
 from datetime import datetime, timedelta
 import random
 from frappe import _
+from book_my_meeting.book_my_meeting.utils import (
+    generate_otp,
+    send_email_otp,
+    verify_email_otp
+)
 
 @frappe.whitelist(allow_guest=True)
 def get_meeting_rooms():
@@ -150,7 +155,7 @@ def get_meeting_room_by_name(name, date=None):
     }
 
 @frappe.whitelist(allow_guest=True)
-def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, email, phone, purpose):
+def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, email, phone, purpose, otp=None):
     # Check if all parameters are provided
     if not all([meeting_room, date, start_time, end_time, name, email, phone, purpose]):
         return {
@@ -213,7 +218,23 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
             "success": False, 
             "message": _("You have already booked a slot for this date.")
         }
-        
+    
+    # Validate OTP if provided
+    if otp:
+        verification_result = verify_email_otp(email, otp)
+        if verification_result["status"] != "verified":
+            return {
+                "success": False, 
+                "message": verification_result.get("message", "OTP verification failed.")
+            }
+    else:
+        result = send_email_otp(email)
+        return {
+            "success": False, 
+            "otpSent": True,
+            "message": result.get("message", _("An OTP has been sent to your email. Please verify to continue."))
+        }
+    
     # Create a new Meeting Room Booking document
     booking = frappe.get_doc({
         "doctype": "Meeting Room Booking",
@@ -235,7 +256,7 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
     return {"success": True, "message": _("Meeting room booking saved successfully.")}
 
 @frappe.whitelist(allow_guest=True)
-def get_bookings_by_email(email):
+def get_bookings_by_email(email,otp=None):
     if not email:
         frappe.throw(_("Email is required."))
 
@@ -246,6 +267,23 @@ def get_bookings_by_email(email):
             "success": False,
             "message": _("The provided email is not registered with us. Please contact support.")
         }
+
+    # Validate OTP if provided
+    if otp:
+        verification_result = verify_email_otp(email, otp)
+        if verification_result["status"] != "verified":
+            return {
+                "success": False, 
+                "message": verification_result.get("message", "OTP verification failed.")
+            }
+    else:
+        result = send_email_otp(email)
+        return {
+            "success": False, 
+            "otpSent": True,
+            "message": result.get("message", _("An OTP has been sent to your email. Please verify to continue."))
+        }
+        
 
     # Fetch bookings associated with the email
     bookings = frappe.get_all(
