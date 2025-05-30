@@ -243,4 +243,16 @@ app_license = "mit"
 # }
 
 
+fixtures = [
+	{
+        "doctype":"Custom HTML Block",
+		"filters":[
+			[
+				"name", "in", ("Book My Meeting App Link")
+			]
+		]
+	}    
+]
+
+
 website_route_rules = [{'from_route': '/bookmymeeting/<path:app_path>', 'to_route': 'bookmymeeting'},]

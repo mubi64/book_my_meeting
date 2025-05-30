@@ -1,0 +1,13 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Custom HTML Block",
+  "html": "<a href=\"/bookmymeeting\" target=\"_blank\" style=\"font-weight:bold\">Booking App <i class=\"fa fa-external-link\"></i></a>",
+  "modified": "2025-05-20 15:50:55.228572",
+  "name": "Book My Meeting App Link",
+  "private": 0,
+  "roles": [],
+  "script": null,
+  "style": null
+ }
+]
