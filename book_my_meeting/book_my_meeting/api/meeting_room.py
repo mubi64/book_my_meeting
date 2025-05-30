@@ -39,7 +39,7 @@ def get_meeting_rooms():
     return result
 
 @frappe.whitelist(allow_guest=True)
-def get_meeting_room_by_name(name, date=None):
+def get_meeting_room_by_name(name, date=None, time=None):
     doc = frappe.get_doc("Meeting Room", name)
 
     # Check allowed future booking days
@@ -73,7 +73,7 @@ def get_meeting_room_by_name(name, date=None):
         frappe.throw("Date is required.")
     requested_date = datetime.strptime(date, "%Y-%m-%d")
     today = datetime.today()
-    now = datetime.now()
+    now = datetime.strptime(f"{date} {time}", "%Y-%m-%d %H:%M") if time else datetime.now()
     is_today = requested_date.date() == today.date()
 
     # Working hours and slot duration

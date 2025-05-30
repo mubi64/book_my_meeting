@@ -81,7 +81,8 @@ let selectedRoom = createResource({
   url: 'book_my_meeting.book_my_meeting.api.meeting_room.get_meeting_room_by_name',
   params:{
     name: roomId,
-    date: selectedDate.value.toISOString().split('T')[0]
+    date: selectedDate.value.toISOString().split('T')[0],
+    time: (new Date()).toTimeString().slice(0, 5)
   },
   auto: true,
   onSuccess: (data) => {
@@ -96,11 +97,13 @@ const formattedSelectedDate = computed(() => {
 });
 
 watch(selectedDate, (newDate) => {
+  
   const adjustedDate = new Date(newDate.getTime() - newDate.getTimezoneOffset() * 60000);
   selectedRoom.update({
     params:{
       name: roomId,
-      date: adjustedDate.toISOString().split('T')[0]
+      date: adjustedDate.toISOString().split('T')[0],
+      time: (new Date()).toTimeString().slice(0, 5)
     }
   });
   selectedRoom.fetch();
