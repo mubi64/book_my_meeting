@@ -56,7 +56,8 @@ def send_email_otp(email):
         frappe.sendmail(
             recipients=[email],
             subject="Your OTP Code for Book My Meeting",
-            message=f"Your OTP is <b>{otp}</b>. It will expire in 15 minutes."
+            message=f"Your OTP is <b>{otp}</b>. It will expire in 15 minutes.",
+            delayed=False
         )
         return {
                 "success": True,

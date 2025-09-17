@@ -163,6 +163,8 @@ def save_meeting_room_booking(meeting_room, date, start_time, end_time, name, em
                 "message": _("Please fill the required fields")
             }
 
+    frappe.set_user("Administrator")  # Act as Administrator
+    
     # Fetch the Meeting Room document
     meeting_room_doc = frappe.get_doc("Meeting Room", meeting_room)
 
@@ -260,6 +262,7 @@ def get_bookings_by_email(email,otp=None):
     if not email:
         frappe.throw(_("Email is required."))
 
+    frappe.set_user("Administrator")  # Act as Administrator
     # Check if email exists in contacts
     contact_exists = frappe.db.exists("Contact", {"email_id": email})
     if not contact_exists:
@@ -280,7 +283,7 @@ def get_bookings_by_email(email,otp=None):
         result = send_email_otp(email)
         return {
             "success": False, 
-            "otpSent": True,
+            "otpSent": result.get("success"),
             "message": result.get("message", _("An OTP has been sent to your email. Please verify to continue."))
         }
         
